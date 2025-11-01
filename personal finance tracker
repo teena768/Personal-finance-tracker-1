@@ -1,0 +1,101 @@
+import tkinter as tk
+from tkinter import ttk, messagebox
+
+# ----------------------------
+# Function to get AI suggestion
+# -----------------------------
+def get_ai_suggestion(amount):
+    try:
+        amount = float(amount)
+        if amount < 1000:
+            return "Low Expense"
+        elif 1000 <= amount < 5000:
+            return "Moderate Expense"
+        else:
+            return "High Expense"
+    except ValueError:
+        return "Invalid Amount"
+
+# -----------------------------
+# Function to add transaction
+# -----------------------------
+def add_transaction():
+    desc = desc_entry.get()
+    amt = amount_entry.get()
+    cat = category_combo.get()
+
+    if not desc or not amt or not cat:
+        messagebox.showwarning("Input Error", "Please fill all fields.")
+        return
+
+    ai_suggestion = get_ai_suggestion(amt)
+    ai_label.config(text=f"AI Suggestion: {ai_suggestion}", fg="red")
+
+    # Insert into table
+    transaction_table.insert("", "end", values=(desc, amt, cat, ai_suggestion))
+
+    # Clear input fields
+    desc_entry.delete(0, tk.END)
+    amount_entry.delete(0, tk.END)
+    category_combo.set("")
+
+# -----------------------------
+# Main Window
+# -----------------------------
+root = tk.Tk()
+root.title("AI-Powered Personal Finance Tracker")
+root.geometry("800x500")
+root.config(bg="#E6F0FA")
+
+# -----------------------------
+# Title Label
+# -----------------------------
+title_label = tk.Label(root, text="Personal Finance Tracker", font=("Arial", 20, "bold"), bg="#E6F0FA", fg="#003366")
+title_label.pack(pady=10)
+
+# -----------------------------
+# Input Frame
+# -----------------------------
+input_frame = tk.Frame(root, bg="#E6F0FA")
+input_frame.pack(pady=10)
+
+tk.Label(input_frame, text="Description:", font=("Arial", 12), bg="#E6F0FA").grid(row=0, column=0, padx=10, pady=5, sticky="e")
+desc_entry = tk.Entry(input_frame, width=30)
+desc_entry.grid(row=0, column=1, padx=10, pady=5)
+
+tk.Label(input_frame, text="Amount (₹):", font=("Arial", 12), bg="#E6F0FA").grid(row=1, column=0, padx=10, pady=5, sticky="e")
+amount_entry = tk.Entry(input_frame, width=30)
+amount_entry.grid(row=1, column=1, padx=10, pady=5)
+
+tk.Label(input_frame, text="Category:", font=("Arial", 12), bg="#E6F0FA").grid(row=2, column=0, padx=10, pady=5, sticky="e")
+category_combo = ttk.Combobox(input_frame, values=["Food", "Transport", "Shopping", "Bills", "Other"], width=27)
+category_combo.grid(row=2, column=1, padx=10, pady=5)
+
+# -----------------------------
+# Add Button
+# -----------------------------
+add_btn = tk.Button(root, text="Add Transaction", font=("Arial", 12, "bold"), bg="#003366", fg="white",
+                    command=add_transaction)
+add_btn.pack(pady=10)
+
+# -----------------------------
+# AI Suggestion Label
+# -----------------------------
+ai_label = tk.Label(root, text="AI Suggestion: ", font=("Arial", 12, "bold"), fg="red", bg="#E6F0FA")
+ai_label.pack(pady=5)
+
+# -----------------------------
+# Table for Transactions
+# -----------------------------
+columns = ("Description", "Amount (₹)", "Category", "AI Suggestion")
+transaction_table = ttk.Treeview(root, columns=columns, show="headings", height=10)
+for col in columns:
+    transaction_table.heading(col, text=col)
+    transaction_table.column(col, width=150, anchor="center")
+
+transaction_table.pack(pady=10, fill="x")
+
+# -----------------------------
+# Run App
+# -----------------------------
+root.mainloop()
